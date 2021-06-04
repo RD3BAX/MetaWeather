@@ -1,5 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Globalization;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MetaWeather
@@ -17,14 +22,25 @@ namespace MetaWeather
 
         #region Методы
 
+        private static readonly JsonSerializerOptions __JsonOptions = new()
+        {
+            Converters =
+            {
+                new JsonStringEnumConverter(),
+                new JsonCoordinateConverter()
+            }
+        };
+
         /// <summary>
         /// Метод получения географических координат по названию населенного пункта
         /// </summary>
         /// <param name="Name">Населенный пункт</param>
         /// <returns></returns>
-        public async Task<WeatherLocation[]> GetLocationByName(string Name)
+        public async Task<WeatherLocation[]> GetLocationByName(string Name, CancellationToken Cancel = default)
         {
-            return await _client.GetFromJsonAsync<WeatherLocation[]>($"/api/location/search/?query={Name}");
+            return await _client
+                .GetFromJsonAsync<WeatherLocation[]>($"/api/location/search/?query={Name}", __JsonOptions, Cancel)
+                .ConfigureAwait(false);
         }
 
         #endregion // Методы
@@ -41,26 +57,58 @@ namespace MetaWeather
         /// <summary>
         /// Where On Earth ID
         /// </summary>
-        public int woeid { get; set; }
+        [JsonPropertyName("woeid")]
+        public int Id { get; set; }
 
         /// <summary>
         /// Name of the location
         /// </summary>
-        public string title { get; set; }
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
 
         /// <summary>
         /// (City|Region / State / Province|Country|Continent)
         /// </summary>
-        public string location_type { get; set; }
+        [JsonPropertyName("location_type")]
+        public LocationType Type { get; set; }
 
         /// <summary>
         /// floats, comma separated
         /// </summary>
-        public string latt_long { get; set; }
+        [JsonPropertyName("latt_long")]
+        public (double Latitude, double Longitude) Location { get; set; }
 
         /// <summary>
         /// Only returned on a lattlong search
         /// </summary>
-        public int distance { get; set; }
+        [JsonPropertyName("distance")]
+        public int Distance { get; set; }
+    }
+
+    public enum LocationType
+    {
+        City,
+        Region,
+        State,
+        Province,
+        Country,
+        Continent
+    }
+
+    internal class JsonCoordinateConverter : JsonConverter<(double Latitude, double Longitude)>
+    {
+        public override (double Latitude, double Longitude) Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var str = reader.GetString();
+            var components = str.Split(',');
+            var lat = double.Parse(components[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+            var lon = double.Parse(components[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+            return (lat, lon);
+        }
+
+        public override void Write(Utf8JsonWriter writer, (double Latitude, double Longitude) value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue($"{value.Latitude},{value.Longitude}");
+        }
     }
 }
