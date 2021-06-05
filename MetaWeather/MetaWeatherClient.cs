@@ -97,19 +97,15 @@ namespace MetaWeather
 
     internal class JsonCoordinateConverter : JsonConverter<(double Latitude, double Longitude)>
     {
-        public override (double Latitude, double Longitude) Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if(reader.GetString() is not {Length: >= 3} str) return (double.NaN, double.NaN);
-            if(str.Split(',') is not {Length: 2} components) return (double.NaN, double.NaN);
-            if(!double.TryParse(components[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var lat)) return (double.NaN, double.NaN);
-            if(!double.TryParse(components[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var lon)) return (double.NaN, double.NaN);
+        public override (double Latitude, double Longitude) Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            reader.GetString() is not {Length: >= 3} str
+            || str.Split(',') is not {Length: 2} components
+            || !double.TryParse(components[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var lat)
+            || !double.TryParse(components[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var lon)
+                ? (double.NaN, double.NaN)
+                : (lat, lon);
 
-            return (lat, lon);
-        }
-
-        public override void Write(Utf8JsonWriter writer, (double Latitude, double Longitude) value, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue($"{value.Latitude},{value.Longitude}");
-        }
+        public override void Write(Utf8JsonWriter writer, (double Latitude, double Longitude) value, JsonSerializerOptions options) => writer
+            .WriteStringValue($"{value.Latitude.ToString(CultureInfo.InvariantCulture)},{value.Longitude.ToString(CultureInfo.InvariantCulture)}");
     }
 }
