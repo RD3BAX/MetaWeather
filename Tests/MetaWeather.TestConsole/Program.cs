@@ -29,7 +29,7 @@ namespace MetaWeather.TestConsole
 
             var weather = Services.GetRequiredService<MetaWeatherClient>();
 
-            var location = await weather.GetLocationByName("Moscow");
+            var location = await weather.GetLocationByName("san");
 
             Console.WriteLine("Завешено!");
             Console.ReadLine();
