@@ -1,8 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <LangVersion>9.0</LangVersion>
+    </PropertyGroup>
+  
+    <PropertyGroup>
+      <Version>1.0.0.1</Version>
+      <PackageReleaseNotes>Старт проекта</PackageReleaseNotes>
+    </PropertyGroup>
+
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>MetaWeather.snk</AssemblyOriginatorKeyFile>
+    <Description>Клиент для MetaWeather api</Description>
+    <Authors>rd3bax@gmail.com</Authors>
+    <Company>Amber-Castle</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/RD3BAX/MetaWeather</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RD3BAX/MetaWeather.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Weather, MetaWeather, WebAPI</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
