@@ -70,6 +70,14 @@ namespace MetaWeather
                 .ConfigureAwait(default);
         }
 
+        public Task<WeatherInfo[]> GetWeather(LocationInfo Location, DateTime Time,
+            CancellationToken Cancel = default) =>
+            GetWeather(Location.Id, Time, Cancel);
+
+        public Task<WeatherInfo[]> GetWeather(WeatherLocation Location, DateTime Time,
+            CancellationToken Cancel = default) =>
+            GetWeather(Location.Id, Time, Cancel);
+
         #endregion // Методы
 
         #region Конструктор
