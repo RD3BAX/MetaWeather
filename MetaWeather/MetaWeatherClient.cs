@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -62,6 +63,12 @@ namespace MetaWeather
 
         public Task<LocationInfo> GetInfo(WeatherLocation Location, CancellationToken Cancel = default) =>
             GetInfo(Location.Id, Cancel);
+
+        public async Task<WeatherInfo[]> GetWeather(int WoeId, DateTime Time, CancellationToken Cancel = default)
+        {
+            return await _client.GetFromJsonAsync<WeatherInfo[]>($"/api/location/{WoeId}/{Time:yyyy}/{Time:MM}/{Time:dd}/", Cancel)
+                .ConfigureAwait(default);
+        }
 
         #endregion // Методы
 
